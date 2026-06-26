@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soft Static — Get Your Key</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: #08080e;
+            color: #ebebff;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* Animated background */
+        body::before {
+            content: '';
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(0,210,200,0.04) 0%, transparent 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: pulse 4s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+        }
+
+        .card {
+            background: #0e0e16;
+            border: 1px solid #191c2d;
+            border-radius: 16px;
+            padding: 40px;
+            width: 100%;
+            max-width: 420px;
+            position: relative;
+            box-shadow: 0 0 60px rgba(0,210,200,0.06);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 16px;
+            padding: 1px;
+            background: linear-gradient(135deg, rgba(0,210,200,0.3), transparent 50%, rgba(0,210,200,0.1));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+
+        .logo {
+            font-size: 26px;
+            font-weight: 800;
+            color: #ebebff;
+            margin-bottom: 4px;
+            letter-spacing: -0.5px;
+        }
+
+        .logo span {
+            color: #00d2c8;
+        }
+
+        .subtitle {
+            font-size: 12px;
+            color: #78798a;
+            margin-bottom: 32px;
+        }
+
+        .status-box {
+            background: #0a0a12;
+            border: 1px solid #191c2d;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 24px;
+            text-align: center;
+            min-height: 90px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .status-label {
+            font-size: 10px;
+            color: #78798a;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .key-display {
+            font-size: 18px;
+            font-weight: 700;
+            color: #00d2c8;
+            letter-spacing: 2px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .loading-dots {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .loading-dots span {
+            width: 6px;
+            height: 6px;
+            background: #00d2c8;
+            border-radius: 50%;
+            animation: bounce 1.2s ease-in-out infinite;
+        }
+
+        .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
+        .copy-btn {
+            width: 100%;
+            padding: 14px;
+            background: rgba(0,210,200,0.08);
+            border: 1px solid rgba(0,210,200,0.25);
+            border-radius: 10px;
+            color: #00d2c8;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .copy-btn:hover {
+            background: rgba(0,210,200,0.15);
+            border-color: rgba(0,210,200,0.5);
+            transform: translateY(-1px);
+        }
+
+        .copy-btn:active {
+            transform: translateY(0);
+        }
+
+        .copy-btn.copied {
+            background: rgba(0,210,200,0.2);
+            border-color: #00d2c8;
+            color: #fff;
+        }
+
+        .copy-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .discord-btn {
+            width: 100%;
+            padding: 12px;
+            background: transparent;
+            border: 1px solid #191c2d;
+            border-radius: 10px;
+            color: #78798a;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+        }
+
+        .discord-btn:hover {
+            border-color: #5865f2;
+            color: #5865f2;
+        }
+
+        .expiry-note {
+            font-size: 10px;
+            color: #3c4155;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .expiry-note span {
+            color: #00d2c8;
+        }
+
+        .error-text {
+            color: #ff5050;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .footer {
+            margin-top: 40px;
+            font-size: 10px;
+            color: #3c4155;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div class="logo">⚡ Soft <span>Static</span></div>
+    <div class="subtitle">Grow a Garden 2 — Key System</div>
+
+    <div class="status-box" id="statusBox">
+        <div class="loading-dots">
+            <span></span><span></span><span></span>
+        </div>
+        <div class="status-label">Generating your key...</div>
+    </div>
+
+    <button class="copy-btn" id="copyBtn" disabled onclick="copyKey()">
+        Copy Key
+    </button>
+
+    <a class="discord-btn" href="https://discord.gg/nyhH3MvWmG" target="_blank">
+        💬 Join Discord for support
+    </a>
+
+    <div class="expiry-note">
+        Your key expires in <span>24 hours</span> and is locked to your device.
+    </div>
+</div>
+
+<div class="footer">⚡ Soft Static Hub • discord.gg/nyhH3MvWmG</div>
+
+<script>
+    let generatedKey = null;
+
+    function generateKeyString() {
+        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+        const seg = () => Array.from({length: 4}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+        return `SS-${seg()}-${seg()}-${seg()}`;
+    }
+
+    async function generateKey() {
+        const key = generateKeyString();
+
+        const expires = new Date();
+        expires.setHours(expires.getHours() + 24);
+
+        const res = await fetch('/api/generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                key: key,
+                expires_at: expires.toISOString()
+            })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+            generatedKey = key;
+            document.getElementById('statusBox').innerHTML = `
+                <div class="status-label">Your Key</div>
+                <div class="key-display">${key}</div>
+            `;
+            const btn = document.getElementById('copyBtn');
+            btn.disabled = false;
+        } else {
+            document.getElementById('statusBox').innerHTML = `
+                <div class="error-text">✗ Failed to generate key</div>
+                <div class="status-label">Please rejoin from the link</div>
+            `;
+        }
+    }
+
+    function copyKey() {
+        if (!generatedKey) return;
+        navigator.clipboard.writeText(generatedKey).then(() => {
+            const btn = document.getElementById('copyBtn');
+            btn.textContent = '✓ Copied!';
+            btn.classList.add('copied');
+            setTimeout(() => {
+                btn.textContent = 'Copy Key';
+                btn.classList.remove('copied');
+            }, 2000);
+        });
+    }
+
+    generateKey();
+</script>
+
+</body>
+</html>
