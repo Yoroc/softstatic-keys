@@ -1,16 +1,16 @@
 export default async function handler(req, res) {
-    if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'Method not allowed' });
-    }
+    res.setHeader('Access-Control-Allow-Origin', '*')
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
 
-    const { key, expires_at } = req.body;
+    if (req.method === 'OPTIONS') return res.status(200).end()
+    if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
 
-    if (!key) {
-        return res.status(400).json({ error: 'Missing key' });
-    }
+    const { key, expires_at } = req.body
+    if (!key) return res.status(400).json({ error: 'Missing key' })
 
-    const SUPABASE_URL = process.env.SUPABASE_URL;
-    const SUPABASE_KEY = process.env.SUPABASE_KEY;
+    const SUPABASE_URL = process.env.SUPABASE_URL
+    const SUPABASE_KEY = process.env.SUPABASE_KEY
 
     try {
         const response = await fetch(`${SUPABASE_URL}/rest/v1/keys`, {
@@ -27,15 +27,17 @@ export default async function handler(req, res) {
                 is_used: false,
                 hwid: null
             })
-        });
+        })
 
         if (response.ok) {
-            return res.status(200).json({ success: true });
+            return res.status(200).json({ success: true })
         } else {
-            const err = await response.text();
-            return res.status(500).json({ success: false, error: err });
+            const err = await response.text()
+            console.error('Supabase error:', err)
+            return res.status(500).json({ success: false, error: err })
         }
     } catch (e) {
-        return res.status(500).json({ success: false, error: e.message });
+        console.error('Catch error:', e)
+        return res.status(500).json({ success: false, error: e.message })
     }
 }
