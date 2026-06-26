@@ -252,37 +252,52 @@
     }
 
     async function generateKey() {
-        const key = generateKeyString();
+    const params = new URLSearchParams(window.location.search)
+    const ref = params.get('ref')
 
-        const expires = new Date();
-        expires.setHours(expires.getHours() + 24);
+    if (ref !== 'FbgcCUbR') {
+        document.getElementById('statusBox').innerHTML = `
+            <div class="error-text">✗ Access Denied</div>
+            <div class="status-label">Complete the steps to get your key</div>
+        `
+        document.getElementById('copyBtn').disabled = true
 
-        const res = await fetch('/api/generate', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                key: key,
-                expires_at: expires.toISOString()
-            })
-        });
-
-        const data = await res.json();
-
-        if (data.success) {
-            generatedKey = key;
-            document.getElementById('statusBox').innerHTML = `
-                <div class="status-label">Your Key</div>
-                <div class="key-display">${key}</div>
-            `;
-            const btn = document.getElementById('copyBtn');
-            btn.disabled = false;
-        } else {
-            document.getElementById('statusBox').innerHTML = `
-                <div class="error-text">✗ Failed to generate key</div>
-                <div class="status-label">Please rejoin from the link</div>
-            `;
-        }
+        setTimeout(() => {
+            window.location.href = 'https://lootdest.org/s?OMwSTT89'
+        }, 2000)
+        return
     }
+
+    const key = generateKeyString()
+    const expires = new Date()
+    expires.setHours(expires.getHours() + 24)
+
+    const res = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            key: key,
+            expires_at: expires.toISOString()
+        })
+    })
+
+    const data = await res.json()
+
+    if (data.success) {
+        generatedKey = key
+        document.getElementById('statusBox').innerHTML = `
+            <div class="status-label">Your Key</div>
+            <div class="key-display">${key}</div>
+        `
+        const btn = document.getElementById('copyBtn')
+        btn.disabled = false
+    } else {
+        document.getElementById('statusBox').innerHTML = `
+            <div class="error-text">✗ Failed to generate key</div>
+            <div class="status-label">Please rejoin from the link</div>
+        `
+    }
+}
 
     function copyKey() {
         if (!generatedKey) return;
